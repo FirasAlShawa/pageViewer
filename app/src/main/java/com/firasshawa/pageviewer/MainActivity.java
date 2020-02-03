@@ -6,7 +6,9 @@ import androidx.viewpager.widget.ViewPager;
 import android.animation.ArgbEvaluator;
 import android.os.Bundle;
 import android.util.JsonReader;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -25,8 +27,11 @@ public class MainActivity extends AppCompatActivity {
 
     ListView QuotesListView;
     ArrayList<String> StringQuotes;
-
+    boolean flag = false;
     ViewPager viewPager ;
+    ImageButton like ;
+
+
     MyPageAdapter adapter;
     List<Quote> quoteList;
     int[] colors;
@@ -37,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        like= findViewById(R.id.likeBtn);
         String QuotesString = ReadJson();
         Quote[] Quotes = new Gson().fromJson(QuotesString,Quote[].class);
         quoteList = new ArrayList<>();
@@ -59,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager.setAdapter(adapter);
 
-//        viewPager.setCurrentItem(5);
+        viewPager.setCurrentItem(5);
 
 
         colors =new int[] {
@@ -67,6 +73,21 @@ public class MainActivity extends AppCompatActivity {
                 getResources().getColor(R.color.color1)
         };
 
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(!flag){
+                    like.setImageDrawable(getDrawable(R.drawable.ic_like_red_24dp));
+                }
+                else{
+                    like.setImageDrawable(getDrawable(R.drawable.ic_like_white_24dp));
+                }
+                flag = !flag;
+
+
+            }
+        });
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
             @Override
@@ -83,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
+                like.setImageDrawable(getDrawable(R.drawable.ic_like_white_24dp));
+                flag = false;
+
             }
 
             @Override
