@@ -4,16 +4,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import android.animation.ArgbEvaluator;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.JsonReader;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonWriter;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -26,14 +30,15 @@ import in.goodiebag.carouselpicker.CarouselPicker;
 public class MainActivity extends AppCompatActivity {
 
     ListView QuotesListView;
-    ArrayList<String> StringQuotes;
-    boolean flag = false;
     ViewPager viewPager ;
     ImageButton like ;
 
+    ArrayList<String> StringQuotes;
+    List<Quote> quoteList;
 
     MyPageAdapter adapter;
-    List<Quote> quoteList;
+
+    boolean flag = false;
     int[] colors;
     ArgbEvaluator argbEvaluator = new ArgbEvaluator();
 
@@ -43,6 +48,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         like= findViewById(R.id.likeBtn);
+        viewPager = findViewById(R.id.viewPager);
+
+        colors =new int[] {
+                getResources().getColor(R.color.color0),
+                getResources().getColor(R.color.color1)
+        };
+
+        FillPageViewer();
+
+        like.setOnClickListener(likeListener);
+
+        viewPager.setOnPageChangeListener(pageChangeListener);
+
+
+//        FillCarouselPicker();
+//        listView code
+//        QuotesListView = findViewById(R.id.QuotesListView);
+//        FillListview();
+
+    }
+
+    //my functions
+    private void FillPageViewer(){
         String QuotesString = ReadJson();
         Quote[] Quotes = new Gson().fromJson(QuotesString,Quote[].class);
         quoteList = new ArrayList<>();
@@ -51,75 +79,13 @@ public class MainActivity extends AppCompatActivity {
             quoteList.add(Quotes[i]);
         }
 
-//        for (Quote singleQuote : Quotes) {
-//            quoteList.add(singleQuote);
-//        }
-
-
-        viewPager = findViewById(R.id.viewPager);
-        viewPager.setPadding(130,0,130,0);
-
-//        quoteList = new ArrayList<Quote>(Arrays.asList(Quotes));
-
         adapter = new MyPageAdapter(this,quoteList);
 
         viewPager.setAdapter(adapter);
 
         viewPager.setCurrentItem(5);
 
-
-        colors =new int[] {
-                getResources().getColor(R.color.color0),
-                getResources().getColor(R.color.color1)
-        };
-
-        like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if(!flag){
-                    like.setImageDrawable(getDrawable(R.drawable.ic_like_red_24dp));
-                }
-                else{
-                    like.setImageDrawable(getDrawable(R.drawable.ic_like_white_24dp));
-                }
-                flag = !flag;
-
-
-            }
-        });
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if(position < (adapter.getCount() -1) ){
-                    if(position % 2 == 0){
-                        viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset,colors[0],colors[1]));
-                    }else{
-                        viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset,colors[1],colors[0]));
-                    }
-                }
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                like.setImageDrawable(getDrawable(R.drawable.ic_like_white_24dp));
-                flag = false;
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
-
-//        FillCarouselPicker();
-//        listView code
-//        QuotesListView = findViewById(R.id.QuotesListView);
-//        FillListview();
+        viewPager.setPadding(130,0,130,0);
 
     }
 
@@ -136,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> quoteArrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,StringQuotes);
         QuotesListView.setAdapter(quoteArrayAdapter);
     }
-
 
     public String ReadJson(){
         InputStream quotesStream;
@@ -174,4 +139,45 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //listeners
+    ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.OnPageChangeListener() {
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            if(position < (adapter.getCount() -1) ){
+                if(position % 2 == 0){
+                    viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset,colors[0],colors[1]));
+                }else{
+                    viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset,colors[1],colors[0]));
+                }
+            }
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            like.setImageDrawable(getDrawable(R.drawable.ic_like_white_24dp));
+            flag = false;
+
+        }
+
+        @Override
+
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
+
+    Button.OnClickListener likeListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if(!flag){
+                like.setImageDrawable(getDrawable(R.drawable.ic_like_red_24dp));
+            }
+            else{
+                like.setImageDrawable(getDrawable(R.drawable.ic_like_white_24dp));
+            }
+            flag = !flag;
+        }
+    };
 }
