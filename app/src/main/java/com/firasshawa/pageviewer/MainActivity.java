@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import android.animation.ArgbEvaluator;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.JsonReader;
@@ -23,6 +26,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import in.goodiebag.carouselpicker.CarouselPicker;
@@ -57,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
         FillPageViewer();
 
+        Alram();
+
         like.setOnClickListener(likeListener);
 
         viewPager.setOnPageChangeListener(pageChangeListener);
@@ -69,6 +75,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void Alram(){
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY,7);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
+
+        Intent intent = new Intent(getApplicationContext(),Notification_reciever.class);
+
+        intent.putExtra("quoteOfTheDay",quoteList.get(quoteList.size()-1).getText());
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),500,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager =(AlarmManager) getSystemService(ALARM_SERVICE);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,pendingIntent);
+
+    }
     //my functions
     private void FillPageViewer(){
         String QuotesString = ReadJson();
